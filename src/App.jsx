@@ -8,6 +8,8 @@ import { createGitlabApi } from './infrastructure/gitlabApi';
 import { createGitlabJournal } from './infrastructure/gitlabJournal';
 import ErrorBoundary from './components/ErrorBoundary';
 import Header from './components/Header';
+import BackupPanel from './components/BackupPanel';
+import { createHttpBackupRepository } from './infrastructure/httpBackupRepository';
 import EstimatorPage from './pages/EstimatorPage';
 import PersistenceNotice from './components/PersistenceNotice';
 import { GitlabProvider } from './context/GitlabContext';
@@ -21,6 +23,7 @@ const GitlabPage = lazy(() => import('./pages/GitlabPage'));
 const projectRepository = createLocalStorageProjectRepository();
 const holidayProvider = createHolidayProvider();
 const gitlabJournal = createGitlabJournal();
+const backupRepository = import.meta.env.VITE_STORAGE_BACKUPS === 'true' ? createHttpBackupRepository() : null;
 
 // Configuración por defecto de GitLab: la del proyecto guardado tiene prioridad.
 const gitlabDefaults = {
@@ -51,6 +54,7 @@ export default function App() {
             paddingBottom: '4rem',
           }}>
             <PersistenceNotice />
+            {backupRepository && <BackupPanel repository={backupRepository} />}
             <ErrorBoundary>
               <Suspense fallback={pageFallback}>
                 <Routes>
