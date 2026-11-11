@@ -1,0 +1,32 @@
+name: Construir y probar Docker
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  compose:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Generar un token para esta ejecución
+        run: printf 'STORAGE_API_TOKEN=%s\n' "$(openssl rand -hex 32)" > .env
+      - name: Construir las dos imágenes
+        run: docker compose build
+      - name: Levantar ambos servicios
+        run: docker compose up -d --wait --wait-timeout 90
+      - name: Guardar y recuperar un respaldo
+        run: node scripts/verify-docker.mjs
+      - name: Consultar los logs si falla
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Retirar los contenedores de la prueba
+        if: always()
+        run: |
+          if [ -f .env ]; then docker compose down --volumes; fi
