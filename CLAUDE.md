@@ -52,7 +52,7 @@ Test files are exempt — they legitimately cross layers.
 - `useHolidays()` — `holidaySet`, `holidayList`, `holidaySource`, `holidayCount`.
 - `usePersistence()` — save status, recovery snapshot, retry and recovery-download acknowledgement. Never bypass a blocked recovery to write original data.
 
-Import uses `normalizeProject` and the single `replaceProject` action, so information and sprints change together. The repository returns explicit read/write results (see `application/ports.js`). Corrupt originals are retained, automatic writes are suspended, and recovery archives use `ep_recovery_*`. See `VALIDACION.md` for the no-dependency browser verification fixture and remaining verification limits.
+Import uses `normalizeProject` and the single `replaceProject` action, so information and sprints change together. The repository returns explicit read/write results (see `application/ports.js`). Corrupt originals are retained, automatic writes are suspended, and recovery archives use `ep_recovery_*`.
 
 **Persistence** — the injected repository reads/writes `ep_projectInfo` and `ep_sprints`; the persistence hook saves on change unless recovery is blocked. Both writes must succeed before showing Saved. Holiday caches use `ep_holidays_<year>` (30-day TTL). The `client` field is free text (no fixed default). `src/application/projectValidation.js` normalizes imports and repository data before they enter the application.
 
