@@ -10,3 +10,5 @@
 **/*.xlsx
 tmp
 output
+.docker-local/
+docker-compose.override.yml

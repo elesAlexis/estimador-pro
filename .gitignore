@@ -24,3 +24,7 @@ xlsx_temp/
 # Sistema operativo
 .DS_Store
 Thumbs.db
+
+# Configuración de Docker de este equipo
+/.docker-local/
+/docker-compose.override.yml

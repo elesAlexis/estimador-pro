@@ -1,0 +1,50 @@
+name: estimador-pro-escenario3
+
+services:
+  app:
+    image: estimador-pro-app:escenario3
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    init: true
+    ports:
+      - "127.0.0.1:${APP_PORT:-18082}:8080"
+    environment:
+      STORAGE_URL: http://storage:8081
+      STORAGE_API_TOKEN: ${STORAGE_API_TOKEN:?Completa STORAGE_API_TOKEN en .env}
+    depends_on:
+      storage:
+        condition: service_healthy
+    networks:
+      - lab
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+
+  storage:
+    image: estimador-pro-storage:escenario3
+    build: ./storage
+    init: true
+    expose:
+      - "8081"
+    environment:
+      SQLITE_PATH: /data/estimador.sqlite
+      STORAGE_API_TOKEN: ${STORAGE_API_TOKEN:?Completa STORAGE_API_TOKEN en .env}
+    volumes:
+      - storage_data:/data
+    networks:
+      - lab
+    healthcheck:
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8081/health', timeout=3).close()"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+
+networks:
+  lab:
+    driver: bridge
+
+volumes:
+  storage_data:
