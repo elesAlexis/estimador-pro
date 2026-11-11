@@ -1,0 +1,35 @@
+image: node:22-alpine
+
+stages:
+  - test
+  - deploy
+
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - .npm/
+
+verify:
+  stage: test
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm test
+    - npm run build
+
+# Sintaxis compatible con GitLab 16.1+. Requiere Runner y Pages habilitados.
+pages:
+  stage: deploy
+  needs: [verify]
+  script:
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+    - mkdir -p public
+    - cp -r dist/. public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual

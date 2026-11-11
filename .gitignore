@@ -1,0 +1,26 @@
+# Dependencias y build
+node_modules/
+dist/
+tmp/pdfs/
+output/pdf/
+
+# Registros y entorno local
+*.log
+npm-debug.log*
+.env
+.env.*
+!.env.example
+
+# Configuración local de herramientas
+.claude/settings.local.json
+.vscode/
+.idea/
+
+# Archivos sueltos de referencia (prototipo y Excel descomprimido)
+base.txt
+temp.zip
+xlsx_temp/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
