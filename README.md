@@ -48,16 +48,4 @@ Registra como URI de retorno la raíz exacta de desarrollo o de Pages. La aplica
 
 La canalización `.gitlab-ci.yml` prueba y compila antes de ofrecer el despliegue manual de Pages. En un servidor propio deben estar habilitados Runner, Pages, HTTPS y el control de acceso correspondiente. La visibilidad privada del repositorio no garantiza por sí sola que Pages sea privado.
 
-## Versión personal
-
-La base independiente **Project Atlas** está en `personal/project-atlas`. Consulta un grupo, sus subgrupos, proyectos, issues y milestones en modo de solo lectura. Tiene configuración, almacenamiento temporal OAuth y nombre propios; no comparte sesión con Estimador Pro.
-
-```sh
-cd personal/project-atlas
-copy .env.example .env
-npm run dev
-```
-
-Completa `VITE_GITLAB_GROUP` con la ruta o ID del grupo y registra la URI de retorno en una aplicación OAuth no confidencial con alcance `read_api`. Para convertirla en otro repositorio, copia esa carpeta como raíz del repositorio personal y ejecuta allí `npm install`.
-
 El repositorio contiene la aplicación y su documentación. Los datos de proyectos empresariales, respaldos y credenciales deben mantenerse fuera del repositorio público.
