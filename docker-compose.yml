@@ -10,7 +10,7 @@ services:
     ports:
       - "127.0.0.1:${APP_PORT:-18082}:8080"
     environment:
-      STORAGE_URL: http://almacen:8081
+      STORAGE_URL: http://storage:8081
       STORAGE_API_TOKEN: ${STORAGE_API_TOKEN:?Completa STORAGE_API_TOKEN en .env}
     depends_on:
       storage:
