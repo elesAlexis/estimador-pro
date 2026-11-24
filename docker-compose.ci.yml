@@ -1,0 +1,19 @@
+# Ajustes de docker-compose.yml que solo usa Jenkins (COMPOSE_FILE en el Jenkinsfile).
+# - Cada build usa sus propias etiquetas de imagen, que se borran al terminar.
+# - No publica puertos en el host: la prueba corre dentro de la red lab, así que un build no choca
+#   con otro ni con la aplicación que tengas levantada en 18082.
+# - Pasa la CA opcional de Jenkins a `npm ci` como secreto de compilación.
+services:
+  app:
+    image: estimador-pro-app:${IMAGE_TAG:?Define IMAGE_TAG}
+    build:
+      secrets:
+        - npm_ca
+    ports: !reset []
+
+  storage:
+    image: estimador-pro-storage:${IMAGE_TAG:?Define IMAGE_TAG}
+
+secrets:
+  npm_ca:
+    file: ${CORP_CA_FILE:?Define CORP_CA_FILE (la imagen de Jenkins lo trae)}

@@ -1,0 +1,11 @@
+# Git y GitHub
+git
+github
+# Pipeline declarativo y su vista por etapas
+workflow-aggregator
+pipeline-stage-view
+# Docker Pipeline
+docker-workflow
+# Credenciales en el Jenkinsfile y marcas de tiempo en la consola
+credentials-binding
+timestamper

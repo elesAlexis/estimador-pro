@@ -1,0 +1,23 @@
+# Servidor de integración continua de la Entrega 2. Es independiente del docker-compose.yml de
+# la raíz, que describe la aplicación. Se levanta desde esta carpeta:
+#   docker compose up -d --build
+name: estimador-jenkins
+
+services:
+  jenkins:
+    image: estimador-jenkins:lts-jdk21
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${JENKINS_PORT:-8080}:8080"
+    # El socket del host pertenece a root:root (660) en Docker Desktop. Al usuario jenkins se le
+    # agrega ese grupo en vez de correr Jenkins como root. En Linux, poner en DOCKER_GID el grupo
+    # del socket: stat -c %g /var/run/docker.sock
+    group_add:
+      - "${DOCKER_GID:-0}"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  jenkins_home:

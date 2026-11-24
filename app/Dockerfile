@@ -12,6 +12,12 @@ COPY src ./src
 ENV VITE_STORAGE_BACKUPS=true
 RUN npm run build
 
+# Pruebas unitarias (node:test). Solo se ejecuta con --target unit-test: la imagen final no
+# depende de esta etapa y BuildKit la omite en una compilación normal.
+FROM web-build AS unit-test
+COPY scripts/register-test-loader.mjs scripts/test-loader.mjs ./scripts/
+RUN npm test
+
 FROM node:24.22.2-bookworm-slim
 WORKDIR /app
 

@@ -84,6 +84,32 @@ Sustituye `<ID_DEL_RESPALDO>` por el UUID que devolvió la prueba. `docker compo
 
 GitHub Actions construye las dos imágenes, levanta los servicios y ejecuta la prueba en cada push y pull request. El token se genera para cada ejecución. El resultado está en [Actions](https://github.com/elesAlexis/estimador-pro/actions).
 
+## Entrega 2 · Integración continua con Jenkins
+
+El servidor Jenkins está en `jenkins/`, separado de la aplicación. Su `docker-compose.yml` construye una imagen de `jenkins/jenkins:lts-jdk21` con el cliente de Docker y los plugins de `jenkins/plugins.txt` (Git, GitHub, Pipeline, Docker Pipeline, Credentials Binding y Timestamper). Guarda su configuración en el volumen `jenkins_home` y usa el Docker del host a través de `/var/run/docker.sock`.
+
+```powershell
+cd jenkins
+docker compose up -d --build
+docker compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+```
+
+Abre `http://127.0.0.1:8080` (o el puerto definido en `JENKINS_PORT`), pega la contraseña inicial y crea tu usuario administrador. Si tu red inspecciona TLS, primero copia la CA en `jenkins/certs/` (ver `jenkins/certs/README.md`).
+
+En **Manage Jenkins › Credentials › System › Global** crea la credencial `estimador-storage-token` de tipo *Secret text*, con un valor aleatorio como `[guid]::NewGuid().ToString('N')`. Después crea un ítem **Pipeline** con *Pipeline script from SCM* › Git, el repositorio `https://github.com/elesAlexis/estimador-pro.git`, la rama del `Jenkinsfile` y el *Script Path* `Jenkinsfile`.
+
+El `Jenkinsfile` tiene estas etapas:
+
+| Etapa | Qué hace |
+|---|---|
+| Checkout | Clona el commit del build. |
+| Build | `docker compose build` de `app` y `storage`, con etiquetas `jenkins-<número de build>`. |
+| Test › Pruebas unitarias | `docker build --target unit-test` ejecuta `npm test` dentro de la imagen. |
+| Test › Comunicación entre contenedores | Levanta los servicios con `--wait`. Desde `app` resuelve `storage` y llama a `http://storage:8081/health`. Luego un tercer contenedor en la red `lab` ejecuta `scripts/verify-docker.mjs` contra `http://app:8080`. |
+| post | `always` muestra los registros si algo falló y retira contenedores, red, volumen e imágenes del build. `success`, `failure` y `aborted` informan el resultado. |
+
+`docker-compose.ci.yml` solo lo usa Jenkins: cambia las etiquetas de las imágenes, no publica puertos en el host y entrega la CA opcional a `npm ci`. Cada build usa su propio proyecto de Compose (`estimador-ci-<número de build>`), así que no interfiere con la aplicación que tengas levantada en `18082`.
+
 ## Desarrollo local
 
 Requiere Node.js y npm.
