@@ -96,7 +96,9 @@ docker compose exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 
 Abre `http://127.0.0.1:8080` (o el puerto definido en `JENKINS_PORT`), pega la contraseña inicial y crea tu usuario administrador. Si tu red inspecciona TLS, primero copia la CA en `jenkins/certs/` (ver `jenkins/certs/README.md`).
 
-En **Manage Jenkins › Credentials › System › Global** crea la credencial `estimador-storage-token` de tipo *Secret text*, con un valor aleatorio como `[guid]::NewGuid().ToString('N')`. Después crea un ítem **Pipeline** con *Pipeline script from SCM* › Git, el repositorio `https://github.com/elesAlexis/estimador-pro.git`, la rama del `Jenkinsfile` y el *Script Path* `Jenkinsfile`.
+En **Manage Jenkins › Credentials › System › Global** crea la credencial `estimador-storage-token` de tipo *Secret text*, con un valor aleatorio como `[guid]::NewGuid().ToString('N')`. Después crea un ítem **Pipeline** con *Pipeline script from SCM* › Git, el repositorio `https://github.com/elesAlexis/estimador-pro.git`, la rama `*/main` y el *Script Path* `Jenkinsfile`.
+
+El disparo automático está definido en el propio `Jenkinsfile` con `triggers { pollSCM('H/2 * * * *') }`: Jenkins consulta GitHub cada dos minutos aproximadamente y construye cuando encuentra un commit nuevo. Se usa Poll SCM y no un webhook porque Jenkins corre en `127.0.0.1` y GitHub no puede alcanzarlo. Jenkins solo conoce el disparador después de leer el `Jenkinsfile`, así que el primer build se lanza una vez con **Build Now**. Desde entonces, cada `git push` a `main` inicia un build solo, y su consola empieza con *Started by an SCM change*.
 
 El `Jenkinsfile` tiene estas etapas:
 

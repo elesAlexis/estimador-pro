@@ -18,6 +18,13 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '20'))
     }
 
+    // Integración con GitHub: Jenkins consulta el repositorio cada ~2 minutos y lanza un build
+    // cuando hay commits nuevos. Se usa Poll SCM porque Jenkins corre en 127.0.0.1 y GitHub no
+    // puede entregarle un webhook. Jenkins registra este disparador tras el primer build.
+    triggers {
+        pollSCM('H/2 * * * *')
+    }
+
     environment {
         // Proyecto, red, volumen e imágenes propios de cada build: no tocan la instancia local
         // de la Entrega 1 (estimador-pro-escenario3) ni los builds anteriores.
