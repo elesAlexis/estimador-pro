@@ -31,3 +31,7 @@ Thumbs.db
 
 # Certificados locales para Jenkins (redes con inspección TLS)
 /jenkins/certs/*.crt
+
+# Documentos de la entrega (Word) y sus temporales de bloqueo
+*.docx
+~$*
